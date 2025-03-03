@@ -186,7 +186,7 @@ export function Home() {
   const handleManualChange = (e) => {
     const { checked } = e.target;
     setIsManual(!isManual);
-    client.publish(`LCS/relayLCS/control`, checked ? "MANUAL" : "AUTO", { retain: true }, (err) => {
+    client.publish(`LCS/relayLCS/mode/command`, checked ? "MANUAL" : "AUTO", { retain: true }, (err) => {
       if (err) {
         console.log("error", err);
       }
@@ -205,7 +205,13 @@ export function Home() {
       )
     );
 
-    client.publish(`LCS/relayLCS/status/${id}`, checkedSwitch ? "ON" : "OFF", { retain: true }, (err) => {
+    client.publish(`LCS/relayLCS/control`, checkedSwitch ? `RELAY_${id - 1}:ON` : `RELAY_${id - 1}:OFF`, { retain: true }, (err) => {
+      if (err) {
+        console.log("error", err);
+      }
+    });
+
+    client.publish(`LCS/relayLCS/status/${id}`, checkedSwitch ? `ON` : `OFF`, { retain: true }, (err) => {
       if (err) {
         console.log("error", err);
       }
@@ -221,6 +227,12 @@ export function Home() {
     setClient(client);
 
     client.on("connect", () => {
+      client.subscribe(`LCS/relayLCS/mode/command`, (err) => {
+        if (err) {
+          console.log("error", err);
+        }
+      });
+
       client.subscribe(`LCS/relayLCS/control`, (err) => {
         if (err) {
           console.log("error", err);
@@ -247,7 +259,7 @@ export function Home() {
     client.on("error", (err) => console.log(err));
 
     client.on("message", (topic, message) => {
-      if (topic === "LCS/relayLCS/control") {
+      if (topic === "LCS/relayLCS/mode/command") {
         setIsManual(message.toString() === "MANUAL");
       }
 
@@ -277,6 +289,10 @@ export function Home() {
       // client.end();
     });
   }, [])
+
+  useEffect(() => {
+    console.log("isManual", isManual);
+  }, [isManual])
 
   return (
     <div className="mt-12">
