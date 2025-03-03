@@ -81,103 +81,103 @@ export function Home() {
     {
       id: 1,
       checked: false,
-      label: "Relay 1",
+      label: "Switch 0",
     },
     {
       id: 2,
       checked: false,
-      label: "Relay 2",
+      label: "Switch 1",
     },
     {
       id: 3,
       checked: false,
-      label: "Relay 3",
+      label: "Switch 2",
     },
     {
       id: 4,
       checked: false,
-      label: "Relay 4",
+      label: "Switch 3",
     },
     {
       id: 5,
       checked: false,
-      label: "Relay 5",
+      label: "Switch 4",
     },
-
     {
       id: 6,
       checked: false,
-      label: "Relay 6",
+      label: "Switch 5",
     },
+
     {
       id: 7,
       checked: false,
-      label: "Relay 7",
+      label: "Switch 6",
     },
     {
       id: 8,
       checked: false,
-      label: "Relay 8",
+      label: "Switch 7",
     },
     {
       id: 9,
       checked: false,
-      label: "Relay 9",
+      label: "Switch 8",
     },
     {
       id: 10,
       checked: false,
-      label: "Relay 10",
+      label: "Switch 9",
     },
     {
       id: 11,
       checked: false,
-      label: "Relay 11",
+      label: "Switch 10",
     },
     {
       id: 12,
       checked: false,
-      label: "Relay 12",
+      label: "Switch 11",
     },
     {
       id: 13,
       checked: false,
-      label: "Relay 13",
+      label: "Switch 12",
     },
     {
       id: 14,
       checked: false,
-      label: "Relay 14",
+      label: "Switch 13",
     },
     {
       id: 15,
       checked: false,
-      label: "Relay 15",
+      label: "Switch 14",
     },
     {
       id: 16,
       checked: false,
-      label: "Relay 16",
+      label: "Switch 15",
     },
     {
       id: 17,
       checked: false,
-      label: "Relay 17",
+      label: "Switch 16",
     },
     {
       id: 18,
       checked: false,
-      label: "Relay 18",
+      label: "Switch 17",
     },
     {
       id: 19,
       checked: false,
-      label: "Relay 19",
+      label: "Switch 18",
     },
     {
       id: 20,
       checked: false,
-      label: "Relay 20",
+      label: "Switch 19",
     },
   ]
   );
@@ -289,10 +289,6 @@ export function Home() {
       // client.end();
     });
   }, [])
-
-  useEffect(() => {
-    console.log("isManual", isManual);
-  }, [isManual])
 
   return (
     <div className="mt-12">
