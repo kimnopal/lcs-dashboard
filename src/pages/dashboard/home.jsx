@@ -221,8 +221,6 @@ export function Home() {
     setClient(client);
 
     client.on("connect", () => {
-      console.log("berhasil konek");
-
       client.subscribe(`LCS/relayLCS/control`, (err) => {
         if (err) {
           console.log("error", err);
@@ -279,10 +277,6 @@ export function Home() {
       // client.end();
     });
   }, [])
-
-  useEffect(() => {
-    console.log(isManual);
-  }, [switchData])
 
   return (
     <div className="mt-12">
