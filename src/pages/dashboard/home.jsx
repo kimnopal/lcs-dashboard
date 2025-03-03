@@ -79,103 +79,103 @@ export function Home() {
   }])
   const [switchData, setSwitchData] = useState([
     {
-      id: 1,
+      id: "0",
       checked: false,
       label: "Switch 0",
     },
     {
-      id: 2,
+      id: 1,
       checked: false,
       label: "Switch 1",
     },
     {
-      id: 3,
+      id: 2,
       checked: false,
       label: "Switch 2",
     },
     {
-      id: 4,
+      id: 3,
       checked: false,
       label: "Switch 3",
     },
     {
-      id: 5,
+      id: 4,
       checked: false,
       label: "Switch 4",
     },
     {
-      id: 6,
+      id: 5,
       checked: false,
       label: "Switch 5",
     },
 
     {
-      id: 7,
+      id: 6,
       checked: false,
       label: "Switch 6",
     },
     {
-      id: 8,
+      id: 7,
       checked: false,
       label: "Switch 7",
     },
     {
-      id: 9,
+      id: 8,
       checked: false,
       label: "Switch 8",
     },
     {
-      id: 10,
+      id: 9,
       checked: false,
       label: "Switch 9",
     },
     {
-      id: 11,
+      id: 10,
       checked: false,
       label: "Switch 10",
     },
     {
-      id: 12,
+      id: 11,
       checked: false,
       label: "Switch 11",
     },
     {
-      id: 13,
+      id: 12,
       checked: false,
       label: "Switch 12",
     },
     {
-      id: 14,
+      id: 13,
       checked: false,
       label: "Switch 13",
     },
     {
-      id: 15,
+      id: 14,
       checked: false,
       label: "Switch 14",
     },
     {
-      id: 16,
+      id: 15,
       checked: false,
       label: "Switch 15",
     },
     {
-      id: 17,
+      id: 16,
       checked: false,
       label: "Switch 16",
     },
     {
-      id: 18,
+      id: 17,
       checked: false,
       label: "Switch 17",
     },
     {
-      id: 19,
+      id: 18,
       checked: false,
       label: "Switch 18",
     },
     {
-      id: 20,
+      id: 19,
       checked: false,
       label: "Switch 19",
     },
@@ -205,7 +205,7 @@ export function Home() {
       )
     );
 
-    client.publish(`LCS/relayLCS/control`, checkedSwitch ? `RELAY_${id - 1}:ON` : `RELAY_${id - 1}:OFF`, { retain: true }, (err) => {
+    client.publish(`LCS/relayLCS/control`, checkedSwitch ? `RELAY_${id}:ON` : `RELAY_${id}:OFF`, { retain: true }, (err) => {
       if (err) {
         console.log("error", err);
       }
