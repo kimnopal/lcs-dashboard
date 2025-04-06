@@ -7,7 +7,7 @@ import {
   Switch,
 } from "@material-tailwind/react";
 import { StatisticsCard } from "@/widgets/cards";
-import { ArrowTrendingUpIcon, BoltIcon, ChartBarIcon, ExclamationTriangleIcon, LightBulbIcon } from "@heroicons/react/24/solid";
+import { ArrowTrendingUpIcon, BoltIcon, ChartBarIcon, ExclamationTriangleIcon, LightBulbIcon, ArrowsUpDownIcon } from "@heroicons/react/24/solid";
 import mqtt from "mqtt";
 
 export function Home() {
@@ -76,7 +76,21 @@ export function Home() {
       label: "Frequency",
     },
     topic: "LCS/sensorLCS/PM/frequency",
+  },
+  {
+    color: "gray",
+    icon: ArrowsUpDownIcon,
+    title: "Power Factor",
+    value: "∞",
+    unit: "",
+    footer: {
+      color: "text-green-500",
+      value: "",
+      label: "Power Factor",
+    },
+    topic: "LCS/sensorLCS/PM/powerfactor",
   }])
+
   const [switchData, setSwitchData] = useState([
     {
       id: "0",
@@ -181,6 +195,7 @@ export function Home() {
     },
   ]
   );
+
   const [client, setClient] = useState(null);
 
   const handleManualChange = (e) => {
