@@ -13,7 +13,7 @@ import { statisticsChartsData } from "@/data";
 import { StatisticsChart } from "@/widgets/charts";
 import { chartsConfig } from "@/configs";
 import { database } from "@/utils/firebase";
-import { get, limitToLast, onValue, query, ref } from "firebase/database";
+import { get, limitToLast, onValue, orderByKey, query, ref } from "firebase/database";
 
 export function Home() {
   const [isManual, setIsManual] = useState(false);
@@ -499,12 +499,11 @@ export function Home() {
     });
 
     const fetchData = async () => {
-      const dataRef = query(ref(database, '/sensor_data'), limitToLast(50));
+      const dataRef = query(ref(database, '/sensor_data'), limitToLast(20));
       try {
         onValue(dataRef, (snapshot) => {
           const data = snapshot.val();
           console.log("Fetched data:", data);
-          
           
           // Define metrics to track
           const metrics = ['voltage', 'current', 'energy', 'frequency', 'power', 'powerfactor'];
@@ -521,14 +520,9 @@ export function Home() {
               }
             });
 
-            // Limit to most recent 50 data points
-            const MAX_POINTS = 50;
-            const recentMetricData = metricData.slice(-MAX_POINTS);
-            const recentTimestamps = timestamps.slice(-MAX_POINTS);
-
             // Calculate average
-            const avgValue = recentMetricData.length > 0
-              ? (recentMetricData.reduce((a, b) => a + b, 0) / recentMetricData.length).toFixed(1)
+            const avgValue = metricData.length > 0
+              ? (metricData.reduce((a, b) => a + b, 0) / metricData.length).toFixed(1)
               : 0;
 
             // Update chartData for this metric
@@ -543,13 +537,13 @@ export function Home() {
                       ...item.chart,
                       series: [{
                         ...item.chart.series[0],
-                        data: recentMetricData
+                        data: metricData
                       }],
                       options: {
                         ...item.chart.options,
                         xaxis: {
                           ...item.chart.options.xaxis,
-                          categories: recentTimestamps
+                          categories: timestamps
                         }
                       }
                     }
