@@ -7,8 +7,13 @@ import {
   Switch,
 } from "@material-tailwind/react";
 import { StatisticsCard } from "@/widgets/cards";
-import { ArrowTrendingUpIcon, BoltIcon, ChartBarIcon, ExclamationTriangleIcon, LightBulbIcon, ArrowsUpDownIcon } from "@heroicons/react/24/solid";
+import { ArrowTrendingUpIcon, BoltIcon, ChartBarIcon, ExclamationTriangleIcon, LightBulbIcon, ArrowsUpDownIcon, ClockIcon } from "@heroicons/react/24/solid";
 import mqtt from "mqtt";
+import { statisticsChartsData } from "@/data";
+import { StatisticsChart } from "@/widgets/charts";
+import { chartsConfig } from "@/configs";
+import { database } from "@/utils/firebase";
+import { get, onValue, ref } from "firebase/database";
 
 export function Home() {
   const [isManual, setIsManual] = useState(false);
@@ -90,6 +95,195 @@ export function Home() {
     },
     topic: "LCS/sensorLCS/PM/powerfactor",
   }])
+
+  const [chartData, setChartData] = useState([
+    {
+      code: "voltage",
+      color: "white",
+      title: "Voltage Monitoring",
+      description: "-",
+      footer: "updated 4 min ago",
+      chart: {
+        type: "line",
+        height: 320,
+        series: [
+          {
+            name: "Voltage",
+            data: [],
+          },
+        ],
+        options: {
+          ...chartsConfig,
+          colors: ["#FFD700"],
+          stroke: {
+            lineCap: "round",
+          },
+          markers: {
+            size: 5,
+          },
+          xaxis: {
+            ...chartsConfig.xaxis,
+            categories: false,
+          },
+        },
+      },
+    },
+    {
+      code: "current",
+      color: "white",
+      title: "Current Monitoring",
+      description: "-",
+      footer: "updated 4 min ago",
+      chart: {
+        type: "line",
+        height: 320,
+        series: [
+          {
+            name: "Current",
+            data: [],
+          },
+        ],
+        options: {
+          ...chartsConfig,
+          colors: ["#1E90FF"],
+          stroke: {
+            lineCap: "round",
+          },
+          markers: {
+            size: 5,
+          },
+          xaxis: {
+            ...chartsConfig.xaxis,
+            categories: false,
+          },
+        },
+      },
+    },
+    {
+      code: "power",
+      color: "white",
+      title: "Power Monitoring",
+      description: "-",
+      footer: "updated 4 min ago",
+      chart: {
+        type: "line",
+        height: 320,
+        series: [
+          {
+            name: "Power",
+            data: [],
+          },
+        ],
+        options: {
+          ...chartsConfig,
+          colors: ["#FF4500"],
+          stroke: {
+            lineCap: "round",
+          },
+          markers: {
+            size: 5,
+          },
+          xaxis: {
+            ...chartsConfig.xaxis,
+            categories: false,
+          },
+        },
+      },
+    },
+    {
+      code: "energy",
+      color: "white",
+      title: "Energy Monitoring",
+      description: "-",
+      footer: "updated 4 min ago",
+      chart: {
+        type: "line",
+        height: 320,
+        series: [
+          {
+            name: "Energy",
+            data: [],
+          },
+        ],
+        options: {
+          ...chartsConfig,
+          colors: ["#32CD32"],
+          stroke: {
+            lineCap: "round",
+          },
+          markers: {
+            size: 5,
+          },
+          xaxis: {
+            ...chartsConfig.xaxis,
+            categories: false,
+          },
+        },
+      },
+    },
+    {
+      code: "frequency",
+      color: "white",
+      title: "Frequency Monitoring",
+      description: "-",
+      footer: "updated 4 min ago",
+      chart: {
+        type: "line",
+        height: 320,
+        series: [
+          {
+            name: "Frequency",
+            data: [],
+          },
+        ],
+        options: {
+          ...chartsConfig,
+          colors: ["#FFA500"],
+          stroke: {
+            lineCap: "round",
+          },
+          markers: {
+            size: 5,
+          },
+          xaxis: {
+            ...chartsConfig.xaxis,
+            categories: false,
+          },
+        },
+      },
+    },
+    {
+      code: "powerfactor",
+      color: "white",
+      title: "Power Factor Monitoring",
+      description: "-",
+      footer: "updated 4 min ago",
+      chart: {
+        type: "line",
+        height: 320,
+        series: [
+          {
+            name: "Power Factor",
+            data: [],
+          },
+        ],
+        options: {
+          ...chartsConfig,
+          colors: ["#8A2BE2"],
+          stroke: {
+            lineCap: "round",
+          },
+          markers: {
+            size: 5,
+          },
+          xaxis: {
+            ...chartsConfig.xaxis,
+            categories: false,
+          },
+        },
+      },
+    },
+  ])
 
   const [switchData, setSwitchData] = useState([
     {
@@ -234,7 +428,7 @@ export function Home() {
   }
 
   useEffect(() => {
-    let client = mqtt.connect("wss://99dea6c09ad3478696b5981a6d4ec886.s1.eu.hivemq.cloud:8884/mqtt", {
+    let client = mqtt.connect("wss://5fee0bbd48cc456fb4365291207b4a6e.s1.eu.hivemq.cloud:8884/mqtt", {
       username: "adminLCS",
       password: "adminLCS123",
     });
@@ -303,10 +497,110 @@ export function Home() {
       // message is Buffer
       // client.end();
     });
+
+    const fetchData = async () => {
+      const dataRef = ref(database, '/sensor_data');
+      try {
+        onValue(dataRef, (snapshot) => {
+          const data = snapshot.val();
+          
+          // Define metrics to track
+          const metrics = ['voltage', 'current', 'energy', 'frequency', 'power', 'powerfactor'];
+          
+          // Process data for each metric
+          metrics.forEach(metric => {
+            const metricData = [];
+            const timestamps = [];
+
+            Object.entries(data).forEach(([key, entry]) => {
+              if (entry && entry[metric] !== undefined) {
+                metricData.push(parseFloat(entry[metric]));
+                timestamps.push(key);
+              }
+            });
+
+            // Limit to most recent 50 data points
+            const MAX_POINTS = 50;
+            const recentMetricData = metricData.slice(-MAX_POINTS);
+            const recentTimestamps = timestamps.slice(-MAX_POINTS);
+
+            // Calculate average
+            const avgValue = recentMetricData.length > 0
+              ? (recentMetricData.reduce((a, b) => a + b, 0) / recentMetricData.length).toFixed(1)
+              : 0;
+
+            // Update chartData for this metric
+            setChartData(prev => {
+              return prev.map(item => {
+                if (item.code === metric) {
+                  return {
+                    ...item,
+                    description: `Average ${metric}: ${avgValue}${getUnitForMetric(metric)}`,
+                    footer: `updated ${new Date().toLocaleTimeString()}`,
+                    chart: {
+                      ...item.chart,
+                      series: [{
+                        ...item.chart.series[0],
+                        data: recentMetricData
+                      }],
+                      options: {
+                        ...item.chart.options,
+                        xaxis: {
+                          ...item.chart.options.xaxis,
+                          categories: recentTimestamps
+                        }
+                      }
+                    }
+                  };
+                }
+                return item;
+              });
+            });
+          });
+        });
+
+        // Helper functions
+        function getUnitForMetric(metric) {
+          const units = {
+            voltage: 'V',
+            current: 'A',
+            energy: 'kWh',
+            frequency: 'Hz',
+            power: 'W',
+            powerfactor: ''
+          };
+          return units[metric] || '';
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [])
 
   return (
     <div className="mt-12">
+      <Typography variant="h3" color="blue-gray" className="mb-2">
+        Graph Data
+      </Typography>
+      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-1 xl:grid-cols-2">
+        {chartData.map((props) => (
+          <StatisticsChart
+            key={props.title}
+            {...props}
+            footer={
+              <Typography
+                variant="small"
+                className="flex items-center font-normal text-blue-gray-600"
+              >
+                <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
+                &nbsp;{props.footer}
+              </Typography>
+            }
+          />
+        ))}
+      </div>
       <Typography variant="h3" color="blue-gray" className="mb-2">
         Control Mode
       </Typography>

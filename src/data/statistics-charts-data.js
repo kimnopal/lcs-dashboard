@@ -30,8 +30,8 @@ const dailySalesChart = {
   height: 220,
   series: [
     {
-      name: "Sales",
-      data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+      name: "Voltage",
+      data: [50, 40, 300, 320, 500, 350, 200, 230, 500, 245, 230, 90, 40, 340, 210, 50, 40, 300, 320, 500, 350, 200, 230, 500, 245, 230, 90, 40, 340, 210, 50, 40, 300, 320, 500, 350, 200, 230, 500, 245, 230, 90, 40, 340, 210],
     },
   ],
   options: {
@@ -45,17 +45,7 @@ const dailySalesChart = {
     },
     xaxis: {
       ...chartsConfig.xaxis,
-      categories: [
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories: false,
     },
   },
 };
