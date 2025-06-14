@@ -13,7 +13,7 @@ import { statisticsChartsData } from "@/data";
 import { StatisticsChart } from "@/widgets/charts";
 import { chartsConfig } from "@/configs";
 import { database } from "@/utils/firebase";
-import { get, onValue, ref } from "firebase/database";
+import { get, limitToLast, onValue, query, ref } from "firebase/database";
 
 export function Home() {
   const [isManual, setIsManual] = useState(false);
@@ -499,10 +499,12 @@ export function Home() {
     });
 
     const fetchData = async () => {
-      const dataRef = ref(database, '/sensor_data');
+      const dataRef = query(ref(database, '/sensor_data'), limitToLast(50));
       try {
         onValue(dataRef, (snapshot) => {
           const data = snapshot.val();
+          console.log("Fetched data:", data);
+          
           
           // Define metrics to track
           const metrics = ['voltage', 'current', 'energy', 'frequency', 'power', 'powerfactor'];
@@ -581,6 +583,8 @@ export function Home() {
 
   return (
     <div className="mt-12">
+
+      {/* Graph Data */}
       <Typography variant="h3" color="blue-gray" className="mb-2">
         Graph Data
       </Typography>
@@ -601,6 +605,30 @@ export function Home() {
           />
         ))}
       </div>
+
+      {/* Monitoring Data */}
+      <Typography variant="h3" className="mb-3">Monitoring Data</Typography>
+      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-5">
+        {monitoringData.map(({ icon, title, footer, ...rest }) => (
+          <StatisticsCard
+            key={title}
+            {...rest}
+            value={rest.value + " " + rest.unit}
+            title={title}
+            icon={React.createElement(icon, {
+              className: "w-6 h-6 text-white",
+            })}
+            footer={
+              <Typography className="font-normal text-blue-gray-600">
+                <strong className={footer.color}>{footer.value}</strong>
+                &nbsp;{footer.label}
+              </Typography>
+            }
+          />
+        ))}
+      </div>
+
+      {/* Control Mode */}
       <Typography variant="h3" color="blue-gray" className="mb-2">
         Control Mode
       </Typography>
@@ -630,26 +658,8 @@ export function Home() {
           </CardBody>
         </Card>
       </div>
-      <Typography variant="h3" className="mb-3">Data Monitoring</Typography>
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-5">
-        {monitoringData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            value={rest.value + " " + rest.unit}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
-      </div>
+
+      {/* Control Switch */}
       <Typography variant="h3" className="mb-3">Control Switch</Typography>
       <div className="mb-12 grid gap-y-10 gap-x-6 grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {switchData.map(({ id, checked, label }) => (
